@@ -16,7 +16,7 @@ const Sidebar: React.FC = () => {
     { path: '/projects', label: 'Проекты', icon: '🏗️' },
     { path: '/defects', label: 'Дефекты', icon: '🔧' },
     { path: '/reports', label: 'Отчеты', icon: '📈' },
-    { path: '/users', label: 'Пользователи', icon: '👥', role: 'manager' },
+    { path: '/users', label: 'Пользователи', icon: '👥', roles: ['manager', 'admin'] },
     { path: '/profile', label: 'Профиль', icon: '👤' },
   ];
 
@@ -27,6 +27,9 @@ const Sidebar: React.FC = () => {
     }
     if (item.role && user?.role !== item.role) {
       return false; // Показываем только для указанной роли
+    }
+    if (item.roles && !item.roles.includes(user?.role || '')) {
+      return false; // Показываем только для указанных ролей
     }
     return true;
   });

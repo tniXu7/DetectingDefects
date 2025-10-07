@@ -8,7 +8,8 @@ def create_user(db: Session, user_in: UserCreate):
         username=user_in.username,
         hashed_password=hash_password(user_in.password),
         role=user_in.role,
-        full_name=user_in.full_name
+        full_name=user_in.full_name,
+        email=getattr(user_in, "email", None)
     )
     db.add(user)
     db.commit()

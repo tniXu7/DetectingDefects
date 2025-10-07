@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../store/store';
 import { addNotification } from '../store/notificationSlice';
 import client from '../api/client';
+import RoleManager from '../components/RoleManager';
 
 interface User {
   id: number;
@@ -27,6 +28,7 @@ const Users: React.FC = () => {
   const dispatch = useDispatch();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState<UserCreate>({
     username: '',
@@ -54,6 +56,25 @@ const Users: React.FC = () => {
       }));
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    if (!window.confirm('Вы уверены, что хотите удалить пользователя?')) return;
+    try {
+      setDeletingId(id);
+      await client.delete(`/users/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      dispatch(addNotification({ message: 'Пользователь удалён', type: 'success' }));
+      fetchUsers();
+    } catch (error: any) {
+      dispatch(addNotification({
+        message: error.response?.data?.detail || 'Ошибка удаления пользователя',
+        type: 'error',
+      }));
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -85,7 +106,8 @@ const Users: React.FC = () => {
     }
   };
 
-  const canManageUsers = user?.role === 'manager';
+  const canManageUsers = user?.role === 'manager' || user?.role === 'admin';
+  const isAdmin = user?.role === 'admin';
 
   if (!canManageUsers) {
     return (
@@ -205,7 +227,8 @@ const Users: React.FC = () => {
                   <th>Роль</th>
                   <th>Статус</th>
                   <th>Дата создания</th>
-                </tr>
+                  {isAdmin && <th></th>}
+                  </tr>
               </thead>
               <tbody>
                 {users.map((user) => (
@@ -218,7 +241,8 @@ const Users: React.FC = () => {
                     <td>{user.email || '-'}</td>
                     <td>
                       <span className={`role-badge role-${user.role}`}>
-                        {user.role === 'manager' ? 'Менеджер' : 
+                        {user.role === 'admin' ? 'Администратор' :
+                         user.role === 'manager' ? 'Менеджер' : 
                          user.role === 'engineer' ? 'Инженер' : 'Наблюдатель'}
                       </span>
                     </td>
@@ -227,9 +251,24 @@ const Users: React.FC = () => {
                         {user.is_active ? 'Активен' : 'Неактивен'}
                       </span>
                     </td>
-                    <td>
+                        <td>
                       {new Date(user.created_at).toLocaleDateString('ru-RU')}
                     </td>
+                        {isAdmin && (
+                          <td>
+                            {user.role !== 'admin' ? (
+                              <button
+                                className="btn btn-danger btn-sm"
+                                onClick={() => handleDelete(user.id)}
+                                disabled={deletingId === user.id}
+                              >
+                                {deletingId === user.id ? 'Удаление…' : 'Удалить'}
+                              </button>
+                            ) : (
+                              <span style={{ color: '#adb5bd' }}>—</span>
+                            )}
+                          </td>
+                        )}
                   </tr>
                 ))}
               </tbody>
@@ -237,6 +276,10 @@ const Users: React.FC = () => {
           </div>
         )}
       </div>
+      
+      {isAdmin && (
+        <RoleManager users={users} onUserUpdate={fetchUsers} />
+      )}
     </div>
   );
 };

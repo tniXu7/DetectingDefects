@@ -70,9 +70,7 @@ const Login: React.FC = () => {
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      e.stopPropagation();
-      // Предотвращаем обновление страницы при нажатии Enter
-      return false;
+      // Не сабмитим автоматически, даём пользователю нажать кнопку
     }
   };
 
@@ -176,7 +174,7 @@ const Login: React.FC = () => {
         }
       } else if (err.request) {
         // Запрос был отправлен, но ответа не получено
-        errorMessage = 'Ошибка соединения с сервером';
+        errorMessage = 'Нет ответа от сервера. Проверьте подключение.';
       } else {
         // Что-то другое
         errorMessage = err.message || 'Неизвестная ошибка';
@@ -188,9 +186,6 @@ const Login: React.FC = () => {
         message: errorMessage,
         type: 'error',
       }));
-      
-      // Предотвращаем обновление страницы при ошибке
-      return false;
     } finally {
       setLoading(false);
     }

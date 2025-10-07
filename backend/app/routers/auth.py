@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from app.deps import get_db
 from app.services.auth_service import authenticate_user, create_user
 from app.schemas import Token, UserCreate, UserOut
+from app.models import RoleEnum
 
 router = APIRouter()
 
@@ -16,6 +17,8 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db:
 
 @router.post("/register", response_model=UserOut, tags=["auth"])
 def register(payload: UserCreate, db: Session = Depends(get_db)):
+    # Public registration always creates an observer regardless of requested role
+    payload.role = RoleEnum.observer
     user = create_user(db, payload)
     return user
 

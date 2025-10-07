@@ -31,6 +31,13 @@ def create_test_users():
         # Тестовые пользователи
         test_users = [
             {
+                "username": "admin",
+                "password": "admin123",
+                "role": RoleEnum.admin,
+                "full_name": "Администратор Системы",
+                "email": "admin@example.com"
+            },
+            {
                 "username": "manager",
                 "password": "managerpass",
                 "role": RoleEnum.manager,

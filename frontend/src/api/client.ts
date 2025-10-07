@@ -22,8 +22,13 @@ client.interceptors.request.use(
 client.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      // Токен истек или недействителен
+    // Не перенаправляем для запросов аутентификации, чтобы показать ошибку в форме
+    const url: string | undefined = error?.config?.url;
+    const isAuthEndpoint = url?.includes('/auth/token') || url?.includes('/auth/register');
+    const isAlreadyOnLogin = typeof window !== 'undefined' && window.location.pathname === '/login';
+
+    if (!isAuthEndpoint && error.response?.status === 401 && !isAlreadyOnLogin) {
+      // Токен истёк или недействителен – очищаем и отправляем на логин
       localStorage.removeItem('token');
       window.location.href = '/login';
     }
