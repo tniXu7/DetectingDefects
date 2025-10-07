@@ -17,9 +17,7 @@ export async function listProjects() {
   return r.data;
 }
 
-export async function createProject(project: ProjectCreate, token: string) {
-  const r = await client.post("/projects/", project, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
+export async function createProject(project: ProjectCreate) {
+  const r = await client.post("/projects/", project);
   return r.data;
 }

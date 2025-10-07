@@ -7,3 +7,7 @@ export async function login(username: string, password: string) {
   const r = await client.post("/auth/token", form);
   return r.data;
 }
+
+export const authApi = {
+  getCurrentUser: () => client.get("/users/me"),
+};

@@ -5,14 +5,23 @@ import { RootState } from '../store/store';
 import { loginSuccess } from '../store/authSlice';
 import { addNotification } from '../store/notificationSlice';
 import client from '../api/client';
+import { authApi } from '../api/auth';
 
 const Login: React.FC = () => {
   const [formData, setFormData] = useState({
     username: '',
     password: '',
   });
+  const [registerData, setRegisterData] = useState({
+    username: '',
+    password: '',
+    full_name: '',
+    email: '',
+    role: 'observer'
+  });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [isRegisterMode, setIsRegisterMode] = useState(false);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -24,11 +33,18 @@ const Login: React.FC = () => {
     return null;
   }
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    if (isRegisterMode) {
+      setRegisterData({
+        ...registerData,
+        [e.target.name]: e.target.value,
+      });
+    } else {
+      setFormData({
+        ...formData,
+        [e.target.name]: e.target.value,
+      });
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -37,38 +53,57 @@ const Login: React.FC = () => {
     setError('');
 
     try {
-      const formDataToSend = new FormData();
-      formDataToSend.append('username', formData.username);
-      formDataToSend.append('password', formData.password);
+      if (isRegisterMode) {
+        // Регистрация
+        await client.post('/auth/register', registerData);
+        dispatch(addNotification({
+          message: 'Регистрация успешна! Теперь войдите в систему.',
+          type: 'success',
+        }));
+        setIsRegisterMode(false);
+        setRegisterData({
+          username: '',
+          password: '',
+          full_name: '',
+          email: '',
+          role: 'observer'
+        });
+      } else {
+        // Вход
+        const formDataToSend = new FormData();
+        formDataToSend.append('username', formData.username);
+        formDataToSend.append('password', formData.password);
 
-      const response = await client.post('/auth/token', formDataToSend, {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-      });
+        const response = await client.post('/auth/token', formDataToSend, {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+        });
 
-      const { access_token } = response.data;
+        const { access_token } = response.data;
 
-      // Получаем информацию о пользователе
-      const userResponse = await client.get('/users/me', {
-        headers: {
-          Authorization: `Bearer ${access_token}`,
-        },
-      });
+        // Получаем информацию о пользователе с токеном
+        const userResponse = await client.get('/users/me', {
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+          },
+        });
+        const userData = userResponse.data;
 
-      dispatch(loginSuccess({
-        user: userResponse.data,
-        token: access_token,
-      }));
+        dispatch(loginSuccess({
+          user: userData,
+          token: access_token,
+        }));
 
-      dispatch(addNotification({
-        message: 'Успешный вход в систему!',
-        type: 'success',
-      }));
+        dispatch(addNotification({
+          message: 'Успешный вход в систему!',
+          type: 'success',
+        }));
 
-      navigate('/dashboard');
+        navigate('/dashboard');
+      }
     } catch (err: any) {
-      const errorMessage = err.response?.data?.detail || 'Ошибка входа';
+      const errorMessage = err.response?.data?.detail || (isRegisterMode ? 'Ошибка регистрации' : 'Ошибка входа');
       setError(errorMessage);
       dispatch(addNotification({
         message: errorMessage,
@@ -82,36 +117,118 @@ const Login: React.FC = () => {
   return (
     <div className="login-container">
       <div className="login-card">
-        <h1 className="login-title">Вход в систему</h1>
+        <h1 className="login-title">
+          {isRegisterMode ? 'Регистрация' : 'Вход в систему'}
+        </h1>
         <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="username" className="form-label">
-              Имя пользователя
-            </label>
-            <input
-              type="text"
-              id="username"
-              name="username"
-              className="form-input"
-              value={formData.username}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="password" className="form-label">
-              Пароль
-            </label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              className="form-input"
-              value={formData.password}
-              onChange={handleChange}
-              required
-            />
-          </div>
+          {isRegisterMode ? (
+            <>
+              <div className="form-group">
+                <label htmlFor="username" className="form-label">
+                  Имя пользователя
+                </label>
+                <input
+                  type="text"
+                  id="username"
+                  name="username"
+                  className="form-input"
+                  value={registerData.username}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="password" className="form-label">
+                  Пароль
+                </label>
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  className="form-input"
+                  value={registerData.password}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="full_name" className="form-label">
+                  Полное имя
+                </label>
+                <input
+                  type="text"
+                  id="full_name"
+                  name="full_name"
+                  className="form-input"
+                  value={registerData.full_name}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="email" className="form-label">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  className="form-input"
+                  value={registerData.email}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="role" className="form-label">
+                  Роль
+                </label>
+                <select
+                  id="role"
+                  name="role"
+                  className="form-select"
+                  value={registerData.role}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="observer">Наблюдатель</option>
+                  <option value="engineer">Инженер</option>
+                  <option value="manager">Менеджер</option>
+                </select>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="form-group">
+                <label htmlFor="username" className="form-label">
+                  Имя пользователя
+                </label>
+                <input
+                  type="text"
+                  id="username"
+                  name="username"
+                  className="form-input"
+                  value={formData.username}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="password" className="form-label">
+                  Пароль
+                </label>
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  className="form-input"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+            </>
+          )}
           {error && (
             <div className="mb-2" style={{ color: '#dc3545', fontSize: '0.875rem' }}>
               {error}
@@ -123,19 +240,33 @@ const Login: React.FC = () => {
             style={{ width: '100%' }}
             disabled={loading}
           >
-            {loading ? <span className="spinner"></span> : 'Войти'}
+            {loading ? <span className="spinner"></span> : (isRegisterMode ? 'Зарегистрироваться' : 'Войти')}
           </button>
         </form>
+        
         <div className="text-center mt-3">
-          <p style={{ fontSize: '0.875rem', color: '#666' }}>
-            Тестовые аккаунты:
-          </p>
-          <p style={{ fontSize: '0.75rem', color: '#999' }}>
-            manager/managerpass (Менеджер)<br />
-            engineer/engineerpass (Инженер)<br />
-            observer/observerpass (Наблюдатель)
-          </p>
+          <button
+            type="button"
+            className="btn btn-link"
+            onClick={() => setIsRegisterMode(!isRegisterMode)}
+            style={{ fontSize: '0.875rem', color: '#007bff', textDecoration: 'none' }}
+          >
+            {isRegisterMode ? 'Уже есть аккаунт? Войти' : 'Нет аккаунта? Зарегистрироваться'}
+          </button>
         </div>
+
+        {!isRegisterMode && (
+          <div className="text-center mt-3">
+            <p style={{ fontSize: '0.875rem', color: '#666' }}>
+              Демо-аккаунты:
+            </p>
+            <p style={{ fontSize: '0.75rem', color: '#999' }}>
+              manager/admin123 (Менеджер)<br />
+              engineer/user123 (Инженер)<br />
+              observer/view123 (Наблюдатель)
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

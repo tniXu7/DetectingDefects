@@ -19,7 +19,7 @@ services:
       - DATABASE_URL=postgresql://defects_user:defects_pass@db:5432/defects_db
       - SECRET_KEY=replace-with-secure-key
     ports:
-      - "8000:8000"
+      - "9000:8000"
     depends_on:
       - db
 
@@ -28,7 +28,7 @@ services:
       context: .
       dockerfile: Dockerfile.frontend
     environment:
-      - VITE_API_URL=http://localhost:8000
+      - VITE_API_URL=http://localhost:9000
     ports:
       - "3000:3000"
     depends_on:

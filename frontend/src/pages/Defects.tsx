@@ -23,13 +23,15 @@ const Defects: React.FC = () => {
   });
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (token) {
+      fetchData();
+    }
+  }, [token]);
 
   const fetchData = async () => {
     try {
       const [defectsData, projectsData] = await Promise.all([
-        listDefects(token!),
+        listDefects(),
         listProjects(),
       ]);
       
@@ -53,7 +55,7 @@ const Defects: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await createDefect(formData as DefectCreate, token!);
+      await createDefect(formData as DefectCreate);
       setFormData({
         title: '',
         description: '',
@@ -78,7 +80,7 @@ const Defects: React.FC = () => {
 
   const handleStatusUpdate = async (defectId: number, newStatus: string) => {
     try {
-      await updateDefect(defectId, { status: newStatus }, token!);
+      await updateDefect(defectId, { status: newStatus });
       fetchData();
       dispatch(addNotification({
         message: 'Статус дефекта обновлен!',

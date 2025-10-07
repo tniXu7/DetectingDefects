@@ -18,8 +18,10 @@ const Projects: React.FC = () => {
   });
 
   useEffect(() => {
-    fetchProjects();
-  }, []);
+    if (token) {
+      fetchProjects();
+    }
+  }, [token]);
 
   const fetchProjects = async () => {
     try {
@@ -39,7 +41,7 @@ const Projects: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await createProject(formData, token!);
+      await createProject(formData);
       setFormData({ name: '', description: '' });
       setShowForm(false);
       fetchProjects();

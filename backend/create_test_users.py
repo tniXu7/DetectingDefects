@@ -10,11 +10,11 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from app.database import Base
 from app.models import User, RoleEnum
-from app.utils.security import get_password_hash
+from app.utils.security import hash_password
 import datetime
 
 # Конфигурация базы данных
-DATABASE_URL = "postgresql://postgres:postgres@localhost:5433/construction_defects"
+DATABASE_URL = "postgresql://defects_user:defects_pass@db:5432/defects_db"
 
 # Создаем подключение
 engine = create_engine(DATABASE_URL)
@@ -59,7 +59,7 @@ def create_test_users():
             
             if not existing_user:
                 # Создаем нового пользователя
-                hashed_password = get_password_hash(user_data["password"])
+                hashed_password = hash_password(user_data["password"])
                 
                 user = User(
                     username=user_data["username"],

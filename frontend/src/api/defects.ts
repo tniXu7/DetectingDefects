@@ -25,27 +25,21 @@ export interface Defect {
   updated_at: string;
 }
 
-export async function listDefects(token: string, status?: string, project_id?: number) {
+export async function listDefects(status?: string, project_id?: number) {
   const params = new URLSearchParams();
   if (status) params.append('status', status);
   if (project_id) params.append('project_id', project_id.toString());
   
-  const r = await client.get(`/defects/?${params.toString()}`, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
+  const r = await client.get(`/defects/?${params.toString()}`);
   return r.data;
 }
 
-export async function createDefect(defect: DefectCreate, token: string) {
-  const r = await client.post("/defects/", defect, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
+export async function createDefect(defect: DefectCreate) {
+  const r = await client.post("/defects/", defect);
   return r.data;
 }
 
-export async function updateDefect(id: number, defect: DefectUpdate, token: string) {
-  const r = await client.put(`/defects/${id}`, defect, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
+export async function updateDefect(id: number, defect: DefectUpdate) {
+  const r = await client.put(`/defects/${id}`, defect);
   return r.data;
 }
