@@ -11,7 +11,8 @@ const Sidebar: React.FC = () => {
     return null;
   }
 
-  const menuItems = [
+  type MenuItem = { path: string; label: string; icon: string; roles?: string[] };
+  const menuItems: MenuItem[] = [
     { path: '/dashboard', label: 'Дашборд', icon: '📊' },
     { path: '/projects', label: 'Проекты', icon: '🏗️' },
     { path: '/defects', label: 'Дефекты', icon: '🔧' },
@@ -24,9 +25,6 @@ const Sidebar: React.FC = () => {
   const filteredMenuItems = menuItems.filter(item => {
     if (item.path === '/projects' && user?.role === 'observer') {
       return false; // Наблюдатели не могут создавать проекты
-    }
-    if (item.role && user?.role !== item.role) {
-      return false; // Показываем только для указанной роли
     }
     if (item.roles && !item.roles.includes(user?.role || '')) {
       return false; // Показываем только для указанных ролей
