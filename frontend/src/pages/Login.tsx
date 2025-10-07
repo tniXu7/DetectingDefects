@@ -70,19 +70,12 @@ const Login: React.FC = () => {
     if (e.key === 'Enter') {
       e.preventDefault();
       e.stopPropagation();
-      handleSubmit(e as any);
+      // Не вызываем handleSubmit здесь, чтобы избежать конфликтов
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    e.stopPropagation();
-    
-    // Дополнительная защита от обновления страницы
-    if (e.defaultPrevented) {
-      return;
-    }
-    
     setLoading(true);
     setError('');
 
@@ -187,12 +180,7 @@ const Login: React.FC = () => {
             <h1 className="login-title">
               {isRegisterMode ? 'Регистрация' : 'Вход в систему'}
             </h1>
-        <form onSubmit={handleSubmit} onKeyDown={(e) => {
-          if (e.key === 'Enter') {
-            e.preventDefault();
-            handleSubmit(e);
-          }
-        }}>
+        <form onSubmit={handleSubmit}>
           {isRegisterMode ? (
             <>
               <div className="form-group">
@@ -317,10 +305,6 @@ const Login: React.FC = () => {
             className="btn btn-primary"
             style={{ width: '100%' }}
             disabled={loading}
-            onClick={(e) => {
-              e.preventDefault();
-              handleSubmit(e);
-            }}
           >
             {loading ? <span className="spinner"></span> : (isRegisterMode ? 'Зарегистрироваться' : 'Войти')}
           </button>
