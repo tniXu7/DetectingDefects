@@ -66,9 +66,23 @@ const Login: React.FC = () => {
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      e.stopPropagation();
+      handleSubmit(e as any);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    
+    // Дополнительная защита от обновления страницы
+    if (e.defaultPrevented) {
+      return;
+    }
+    
     setLoading(true);
     setError('');
 
@@ -173,7 +187,12 @@ const Login: React.FC = () => {
             <h1 className="login-title">
               {isRegisterMode ? 'Регистрация' : 'Вход в систему'}
             </h1>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} onKeyDown={(e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            handleSubmit(e);
+          }
+        }}>
           {isRegisterMode ? (
             <>
               <div className="form-group">
@@ -187,6 +206,7 @@ const Login: React.FC = () => {
                   className="form-input"
                   value={registerData.username}
                   onChange={handleChange}
+                  onKeyDown={handleKeyDown}
                   required
                 />
               </div>
@@ -201,6 +221,7 @@ const Login: React.FC = () => {
                   className="form-input"
                   value={registerData.password}
                   onChange={handleChange}
+                  onKeyDown={handleKeyDown}
                   required
                 />
               </div>
@@ -215,6 +236,7 @@ const Login: React.FC = () => {
                   className="form-input"
                   value={registerData.full_name}
                   onChange={handleChange}
+                  onKeyDown={handleKeyDown}
                   required
                 />
               </div>
@@ -229,6 +251,7 @@ const Login: React.FC = () => {
                   className="form-input"
                   value={registerData.email}
                   onChange={handleChange}
+                  onKeyDown={handleKeyDown}
                   required
                 />
               </div>
@@ -263,6 +286,7 @@ const Login: React.FC = () => {
                   className="form-input"
                   value={formData.username}
                   onChange={handleChange}
+                  onKeyDown={handleKeyDown}
                   required
                 />
               </div>
@@ -277,6 +301,7 @@ const Login: React.FC = () => {
                   className="form-input"
                   value={formData.password}
                   onChange={handleChange}
+                  onKeyDown={handleKeyDown}
                   required
                 />
               </div>

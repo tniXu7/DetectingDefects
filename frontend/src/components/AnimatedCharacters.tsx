@@ -25,21 +25,25 @@ const Character: React.FC<CharacterProps> = ({
 
   useEffect(() => {
     // Вычисляем направление взгляда к курсору
-    const deltaX = mousePosition.x - (position.x + 40); // Центр персонажа
-    const deltaY = mousePosition.y - (position.y + 40);
+    const centerX = position.x + 40; // Центр персонажа
+    const centerY = position.y + 40;
+    const deltaX = mousePosition.x - centerX;
+    const deltaY = mousePosition.y - centerY;
     const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
     
     if (distance > 0) {
-      // Ограничиваем максимальное расстояние слежения
-      const maxDistance = 200;
+      // Увеличиваем чувствительность слежения
+      const maxDistance = 300; // Увеличиваем радиус слежения
       const clampedDistance = Math.min(distance, maxDistance);
       
-      const normalizedX = (deltaX / clampedDistance) * Math.min(1, clampedDistance / 100);
-      const normalizedY = (deltaY / clampedDistance) * Math.min(1, clampedDistance / 100);
+      // Более агрессивное слежение
+      const normalizedX = deltaX / Math.max(clampedDistance, 50);
+      const normalizedY = deltaY / Math.max(clampedDistance, 50);
       
+      // Увеличиваем амплитуду движения глаз
       setEyePosition({
-        x: Math.max(-4, Math.min(4, normalizedX * 4)),
-        y: Math.max(-3, Math.min(3, normalizedY * 3))
+        x: Math.max(-8, Math.min(8, normalizedX * 8)),
+        y: Math.max(-6, Math.min(6, normalizedY * 6))
       });
     }
   }, [mousePosition, position]);
@@ -97,25 +101,25 @@ const AnimatedCharacters: React.FC<AnimatedCharactersProps> = ({
   const [characters, setCharacters] = useState([
     {
       id: 1,
-      color: '#2C2C2C',
+      color: '#FF6B6B',
       shape: 'round',
       position: { x: 50, y: 200 }
     },
     {
       id: 2,
-      color: '#6B6B6B',
+      color: '#4ECDC4',
       shape: 'tall',
       position: { x: 150, y: 180 }
     },
     {
       id: 3,
-      color: '#9E9E9E',
+      color: '#45B7D1',
       shape: 'medium',
       position: { x: 250, y: 190 }
     },
     {
       id: 4,
-      color: '#E0E0E0',
+      color: '#FFA07A',
       shape: 'wide',
       position: { x: 350, y: 200 }
     }
