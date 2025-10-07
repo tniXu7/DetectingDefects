@@ -16,6 +16,7 @@ const Login: React.FC = () => {
   const [registerData, setRegisterData] = useState({
     username: '',
     password: '',
+    confirmPassword: '',
     full_name: '',
     email: '',
     role: 'observer'
@@ -75,13 +76,29 @@ const Login: React.FC = () => {
     }
   };
 
+  const validateForm = () => {
+    if (isRegisterMode) {
+      if (registerData.password !== registerData.confirmPassword) {
+        setError('Пароли не совпадают');
+        return false;
+      }
+      if (registerData.password.length < 6) {
+        setError('Пароль должен содержать минимум 6 символов');
+        return false;
+      }
+      if (!registerData.email.includes('@')) {
+        setError('Введите корректный email');
+        return false;
+      }
+    }
+    return true;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    e.stopPropagation();
     
-    // Дополнительная защита от обновления страницы
-    if (e.defaultPrevented) {
-      return false;
+    if (!validateForm()) {
+      return;
     }
     
     setLoading(true);
@@ -89,8 +106,9 @@ const Login: React.FC = () => {
 
     try {
       if (isRegisterMode) {
-        // Регистрация
-        await client.post('/auth/register', registerData);
+        // Регистрация - убираем confirmPassword из данных
+        const { confirmPassword, ...registerDataToSend } = registerData;
+        await client.post('/auth/register', registerDataToSend);
         setLoginState('success');
         dispatch(addNotification({
           message: 'Регистрация успешна! Теперь войдите в систему.',
@@ -100,6 +118,7 @@ const Login: React.FC = () => {
         setRegisterData({
           username: '',
           password: '',
+          confirmPassword: '',
           full_name: '',
           email: '',
           role: 'observer'
@@ -205,7 +224,6 @@ const Login: React.FC = () => {
                   className="form-input"
                   value={registerData.username}
                   onChange={handleChange}
-                  onKeyDown={handleKeyDown}
                   required
                 />
               </div>
@@ -220,7 +238,20 @@ const Login: React.FC = () => {
                   className="form-input"
                   value={registerData.password}
                   onChange={handleChange}
-                  onKeyDown={handleKeyDown}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="confirmPassword" className="form-label">
+                  Подтверждение пароля
+                </label>
+                <input
+                  type="password"
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  className="form-input"
+                  value={registerData.confirmPassword}
+                  onChange={handleChange}
                   required
                 />
               </div>
@@ -235,7 +266,6 @@ const Login: React.FC = () => {
                   className="form-input"
                   value={registerData.full_name}
                   onChange={handleChange}
-                  onKeyDown={handleKeyDown}
                   required
                 />
               </div>
@@ -250,26 +280,21 @@ const Login: React.FC = () => {
                   className="form-input"
                   value={registerData.email}
                   onChange={handleChange}
-                  onKeyDown={handleKeyDown}
                   required
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="role" className="form-label">
-                  Роль
-                </label>
-                <select
-                  id="role"
-                  name="role"
-                  className="form-select"
-                  value={registerData.role}
-                  onChange={handleChange}
-                  required
-                >
-                  <option value="observer">Наблюдатель</option>
-                  <option value="engineer">Инженер</option>
-                  <option value="manager">Менеджер</option>
-                </select>
+                <div className="role-info" style={{ 
+                  padding: '12px', 
+                  backgroundColor: '#f8f9fa', 
+                  border: '1px solid #dee2e6', 
+                  borderRadius: '6px',
+                  fontSize: '0.875rem',
+                  color: '#495057'
+                }}>
+                  <strong>Роль:</strong> Наблюдатель (по умолчанию)<br/>
+                  <small>Роли назначает только администратор системы</small>
+                </div>
               </div>
             </>
           ) : (
@@ -285,7 +310,6 @@ const Login: React.FC = () => {
                   className="form-input"
                   value={formData.username}
                   onChange={handleChange}
-                  onKeyDown={handleKeyDown}
                   required
                 />
               </div>
@@ -300,7 +324,6 @@ const Login: React.FC = () => {
                   className="form-input"
                   value={formData.password}
                   onChange={handleChange}
-                  onKeyDown={handleKeyDown}
                   required
                 />
               </div>
