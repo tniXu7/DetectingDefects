@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { RootState } from '../store/store';
@@ -6,6 +6,7 @@ import { loginSuccess } from '../store/authSlice';
 import { addNotification } from '../store/notificationSlice';
 import client from '../api/client';
 import { authApi } from '../api/auth';
+import AnimatedCharacters from '../components/AnimatedCharacters';
 
 const Login: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -22,10 +23,22 @@ const Login: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [isRegisterMode, setIsRegisterMode] = useState(false);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [loginState, setLoginState] = useState<'idle' | 'error' | 'success'>('idle');
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+
+  // Отслеживание позиции мыши
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePosition({ x: e.clientX, y: e.clientY });
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
 
   // Если уже авторизован, перенаправляем на дашборд
   if (isAuthenticated) {
@@ -56,6 +69,7 @@ const Login: React.FC = () => {
       if (isRegisterMode) {
         // Регистрация
         await client.post('/auth/register', registerData);
+        setLoginState('success');
         dispatch(addNotification({
           message: 'Регистрация успешна! Теперь войдите в систему.',
           type: 'success',
@@ -90,6 +104,7 @@ const Login: React.FC = () => {
         });
         const userData = userResponse.data;
 
+        setLoginState('success');
         dispatch(loginSuccess({
           user: userData,
           token: access_token,
@@ -105,6 +120,7 @@ const Login: React.FC = () => {
     } catch (err: any) {
       const errorMessage = err.response?.data?.detail || (isRegisterMode ? 'Ошибка регистрации' : 'Ошибка входа');
       setError(errorMessage);
+      setLoginState('error');
       dispatch(addNotification({
         message: errorMessage,
         type: 'error',
@@ -116,10 +132,18 @@ const Login: React.FC = () => {
 
   return (
     <div className="login-container">
-      <div className="login-card">
-        <h1 className="login-title">
-          {isRegisterMode ? 'Регистрация' : 'Вход в систему'}
-        </h1>
+      <div className="login-layout">
+        <div className="login-left">
+          <AnimatedCharacters 
+            mousePosition={mousePosition} 
+            loginState={loginState} 
+          />
+        </div>
+        <div className="login-right">
+          <div className="login-card">
+            <h1 className="login-title">
+              {isRegisterMode ? 'Регистрация' : 'Вход в систему'}
+            </h1>
         <form onSubmit={handleSubmit}>
           {isRegisterMode ? (
             <>
@@ -267,6 +291,8 @@ const Login: React.FC = () => {
             </p>
           </div>
         )}
+          </div>
+        </div>
       </div>
     </div>
   );

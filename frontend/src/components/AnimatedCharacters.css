@@ -1,0 +1,191 @@
+.characters-container {
+  position: relative;
+  width: 100%;
+  height: 300px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  border-radius: 20px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.character {
+  position: absolute;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  animation: float 3s ease-in-out infinite;
+}
+
+.character:hover {
+  transform: scale(1.1);
+}
+
+/* Формы персонажей */
+.character-round {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+}
+
+.character-tall {
+  width: 60px;
+  height: 100px;
+  border-radius: 30px;
+}
+
+.character-medium {
+  width: 70px;
+  height: 90px;
+  border-radius: 35px;
+}
+
+.character-wide {
+  width: 100px;
+  height: 70px;
+  border-radius: 50px;
+}
+
+/* Анимация плавания */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Глаза */
+.eyes {
+  position: absolute;
+  top: 25%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+}
+
+.eye {
+  width: 8px;
+  height: 8px;
+  background-color: #333;
+  border-radius: 50%;
+  transition: transform 0.2s ease;
+}
+
+.left-eye {
+  margin-right: 4px;
+}
+
+.right-eye {
+  margin-left: 4px;
+}
+
+/* Рот */
+.mouth {
+  position: absolute;
+  bottom: 25%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 10px;
+  transition: all 0.3s ease;
+}
+
+.mouth.happy {
+  border-radius: 0 0 20px 20px;
+  border: 2px solid #333;
+  border-top: none;
+  background: transparent;
+}
+
+.mouth.sad {
+  border-radius: 20px 20px 0 0;
+  border: 2px solid #333;
+  border-bottom: none;
+  background: transparent;
+}
+
+.mouth.neutral {
+  width: 15px;
+  height: 2px;
+  background-color: #333;
+  border-radius: 1px;
+  border: none;
+}
+
+/* Анимации состояний */
+.character {
+  transition: all 0.5s ease;
+}
+
+.character:hover .eye {
+  animation: blink 0.3s ease;
+}
+
+@keyframes blink {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(0.1); }
+}
+
+/* Анимация радости */
+.character.happy {
+  animation: bounce 0.6s ease;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-20px) scale(1.1); }
+}
+
+/* Анимация грусти */
+.character.sad {
+  animation: droop 0.5s ease;
+}
+
+@keyframes droop {
+  0% { transform: translateY(0) scale(1); }
+  100% { transform: translateY(10px) scale(0.95); }
+}
+
+/* Эффект пульсации при ошибке */
+.character.error {
+  animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .characters-container {
+    height: 200px;
+  }
+  
+  .character {
+    transform: scale(0.8);
+  }
+  
+  .character-round {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .character-tall {
+    width: 45px;
+    height: 75px;
+  }
+  
+  .character-medium {
+    width: 55px;
+    height: 70px;
+  }
+  
+  .character-wide {
+    width: 80px;
+    height: 55px;
+  }
+}

@@ -405,8 +405,37 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #ffffff;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 24px;
+}
+
+.login-layout {
+  display: flex;
+  width: 100%;
+  max-width: 1200px;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  min-height: 600px;
+}
+
+.login-left {
+  flex: 1;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  min-height: 600px;
+}
+
+.login-right {
+  flex: 1;
+  padding: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .login-card {
@@ -418,6 +447,28 @@ body {
   width: 100%;
   max-width: 400px;
   position: relative;
+}
+
+/* Адаптивность для мобильных устройств */
+@media (max-width: 768px) {
+  .login-layout {
+    flex-direction: column;
+    min-height: auto;
+  }
+  
+  .login-left {
+    min-height: 300px;
+    flex: none;
+  }
+  
+  .login-right {
+    padding: 20px;
+  }
+  
+  .login-card {
+    padding: 24px;
+    max-width: 100%;
+  }
 }
 
 .login-title {
