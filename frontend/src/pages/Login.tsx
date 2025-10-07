@@ -47,6 +47,12 @@ const Login: React.FC = () => {
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    // Сбрасываем ошибки при изменении полей
+    if (error) {
+      setError('');
+      setLoginState('idle');
+    }
+    
     if (isRegisterMode) {
       setRegisterData({
         ...registerData,
@@ -62,6 +68,7 @@ const Login: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     setLoading(true);
     setError('');
 
@@ -118,7 +125,29 @@ const Login: React.FC = () => {
         navigate('/dashboard');
       }
     } catch (err: any) {
-      const errorMessage = err.response?.data?.detail || (isRegisterMode ? 'Ошибка регистрации' : 'Ошибка входа');
+      console.error('Login error:', err);
+      
+      let errorMessage = 'Произошла ошибка';
+      
+      if (err.response) {
+        // Сервер ответил с ошибкой
+        if (err.response.status === 401) {
+          errorMessage = 'Неверное имя пользователя или пароль';
+        } else if (err.response.status === 422) {
+          errorMessage = 'Проверьте правильность введенных данных';
+        } else if (err.response.status === 400) {
+          errorMessage = 'Некорректные данные';
+        } else {
+          errorMessage = err.response.data?.detail || 'Ошибка сервера';
+        }
+      } else if (err.request) {
+        // Запрос был отправлен, но ответа не получено
+        errorMessage = 'Ошибка соединения с сервером';
+      } else {
+        // Что-то другое
+        errorMessage = err.message || 'Неизвестная ошибка';
+      }
+      
       setError(errorMessage);
       setLoginState('error');
       dispatch(addNotification({
@@ -263,6 +292,10 @@ const Login: React.FC = () => {
             className="btn btn-primary"
             style={{ width: '100%' }}
             disabled={loading}
+            onClick={(e) => {
+              e.preventDefault();
+              handleSubmit(e);
+            }}
           >
             {loading ? <span className="spinner"></span> : (isRegisterMode ? 'Зарегистрироваться' : 'Войти')}
           </button>
