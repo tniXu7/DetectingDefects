@@ -70,12 +70,20 @@ const Login: React.FC = () => {
     if (e.key === 'Enter') {
       e.preventDefault();
       e.stopPropagation();
-      // Не вызываем handleSubmit здесь, чтобы избежать конфликтов
+      // Предотвращаем обновление страницы при нажатии Enter
+      return false;
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    e.stopPropagation();
+    
+    // Дополнительная защита от обновления страницы
+    if (e.defaultPrevented) {
+      return false;
+    }
+    
     setLoading(true);
     setError('');
 
@@ -161,6 +169,9 @@ const Login: React.FC = () => {
         message: errorMessage,
         type: 'error',
       }));
+      
+      // Предотвращаем обновление страницы при ошибке
+      return false;
     } finally {
       setLoading(false);
     }

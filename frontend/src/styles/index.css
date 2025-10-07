@@ -92,18 +92,21 @@ body {
 .app-content {
   flex: 1;
   display: flex;
+  background: #f8f9fa;
+  min-height: calc(100vh - 64px);
 }
 
 /* Sidebar */
 .sidebar {
   width: 240px;
   background: #ffffff;
-  border-right: 1px solid #e5e5e5;
+  border-right: 1px solid #dee2e6;
   padding: 24px 0;
   position: sticky;
   top: 64px;
   height: calc(100vh - 64px);
   overflow-y: auto;
+  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.05);
 }
 
 .sidebar-nav {
@@ -163,8 +166,8 @@ body {
 /* Main content */
 .main-content {
   flex: 1;
-  padding: 24px;
-  background: #ffffff;
+  padding: 32px;
+  background: #f8f9fa;
   overflow-y: auto;
   max-height: calc(100vh - 64px);
 }
@@ -241,11 +244,18 @@ body {
   background: #212529;
   color: white;
   border-color: #212529;
+  font-weight: 600;
+  padding: 12px 24px;
+  font-size: 1rem;
+  border-radius: 8px;
+  transition: all 0.2s ease;
 }
 
 .btn-primary:hover {
   background: #495057;
   border-color: #495057;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(33, 37, 41, 0.3);
 }
 
 .btn-secondary {
@@ -338,7 +348,7 @@ body {
 
 /* Forms */
 .form-group {
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 
 .form-label {
@@ -418,6 +428,7 @@ body {
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   min-height: 600px;
+  margin: 0 auto;
 }
 
 .login-left {
@@ -432,20 +443,21 @@ body {
 
 .login-right {
   flex: 1;
-  padding: 40px;
+  padding: 60px 40px;
   display: flex;
   align-items: center;
   justify-content: center;
+  min-height: 600px;
 }
 
 .login-card {
   background: #ffffff;
-  border-radius: 8px;
+  border-radius: 12px;
   padding: 48px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e5e5e5;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid #dee2e6;
   width: 100%;
-  max-width: 400px;
+  max-width: 420px;
   position: relative;
 }
 
@@ -472,11 +484,12 @@ body {
 }
 
 .login-title {
-  font-size: 1.5rem;
-  font-weight: 600;
+  font-size: 1.75rem;
+  font-weight: 700;
   color: #212529;
-  margin-bottom: 32px;
+  margin-bottom: 40px;
   text-align: center;
+  letter-spacing: -0.025em;
 }
 
 .login-form {
